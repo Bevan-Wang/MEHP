@@ -247,7 +247,7 @@ def getLA(data, target):
         high_vol_prediction, high_vol_mse, high_vol_rmse, high_vol_mape, high_vol_smape, high_vol_mae, high_vol_r2 = get_lstm(high_vol, 800, 200)
 
         final_prediction = (pd.Series(low_vol_prediction) + pd.Series(high_vol_prediction))
-        # final_prediction = pd.Series(low_vol_prediction)
+
         mse = mean_squared_error(data[target].tail(200).values, final_prediction.values)
         rmse = mse ** 0.5
         mape = mean_absolute_percentage_error(data[target].tail(200).reset_index(drop=True), final_prediction)
@@ -258,6 +258,7 @@ def getLA(data, target):
         # Generate prediction accuracy
         actual = data[target].tail(200).values
         df = pd.DataFrame({'real': actual, 'pre': final_prediction}).to_csv('results_AL.csv', index=False)
+
         result_1 = []
         result_2 = []
         for i in range(1, len(final_prediction)):
@@ -312,15 +313,10 @@ def getLA(data, target):
 
 if __name__ == '__main__':
     # Load historical data
-    # CSV should have columns: ['date', 'OT']
-    target = 'Confirmed'
-    data = pd.read_csv('confirmed_time_series_NY.csv', index_col=0, header=0).tail(1000).reset_index(drop=True)[[target]]
-    time = pd.read_csv('confirmed_time_series_NY.csv', index_col=0, header=0).tail(1000).reset_index(drop=True)['Date']
-    #target = 'transit'
-    #data = pd.read_csv('mobility_time_series_NY.csv', index_col=0, header=0).tail(950).reset_index(drop=True)[[target]]
-    # target = 'pop_flows'
-    # data = pd.read_csv('pop_flow_time_series_NY.csv', index_col=0, header=0).tail(180).reset_index(drop=True)[[target]]
-    # time = pd.read_csv('pop_flow_time_series_NY.csv', index_col=1, header=0).tail(180).reset_index(drop=True)['Date']
+    # CSV should have columns: ['Date', 'Confirmed']
+    data = pd.read_csv('Fused_Date.csv', index_col=0, header=0).tail(1000).reset_index(drop=True)['Confirmed']
+    time = pd.read_csv('Fused_Date.csv', index_col=0, header=0).tail(1000).reset_index(drop=True)['Date']
+
     from sklearn.preprocessing import MinMaxScaler
     scaler = MinMaxScaler(feature_range=(-1, 1))
     amplitude = scaler.fit_transform(data.to_numpy().reshape(-1, 1)).reshape(-1)
